@@ -1,57 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    private Animator _animator;
-    //private CharacterController _characterController;
-    private Rigidbody2D _rb;
-    private Vector3 _moveDir = Vector3.zero;
+    public float speed;
+    public float rotationSpeed;  // radianti
+    public Animator animator;
 
-    public float speed = 5.0f;
-    public float rotationSpeed = 240.0f;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        _animator = GetComponent<Animator>();
-        //_characterController = GetComponent<CharacterController>();
-        _rb = GetComponent<Rigidbody2D>();
-    }
+    private float f_h;
+    private bool b_move;
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         // Get Input
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        f_h = Input.GetAxisRaw("Horizontal");  // rotazione orario - antiorario
+        b_move = Input.GetKey(KeyCode.W);      // movimento in avanti
 
-        // Limit to forward movement
-        //if (v < 0)
-        //    v = 0;
-
-        transform.Rotate(0, 0, -h * rotationSpeed * Time.deltaTime);
-        if(v != 0)
+        transform.Rotate(-Vector3.forward, f_h * rotationSpeed, 0);
+       
+        if (b_move)
         {
-            //gameObject.transform.position += Input.GetAxisRaw("Vertical") * Vector3.up * Time.deltaTime;
-            //transform.TransformVector(Input.GetAxisRaw("Vertical") * Vector3.up * Time.deltaTime);
-            transform.Translate(transform.up * (v * Time.deltaTime));
+            transform.Translate(0f, speed * Time.deltaTime, 0f);  //, Space.Self);
         }
-        
-        /*
-        if(_characterController.isGrounded)
-        {
-            bool move = (v > 0) || (h != 0);
+    }
 
-            _animator.SetBool("walk", move);
-
-            _moveDir = Vector3.forward * v;
-            _moveDir = transform.TransformDirection(_moveDir);
-            _moveDir *= speed;
-        }
-        
-        _characterController.Move(_moveDir * Time.deltaTime);
-        */
+    private void FixedUpdate()
+    {
+        //--------------- Animazioni ---------------
+        animator.SetBool("walk", b_move);  // Idle -> Walk o Walk -> Idle
     }
 }
